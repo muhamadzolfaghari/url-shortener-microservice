@@ -9,8 +9,8 @@ const dns = require("dns");
 // Basic Configuration
 const port = process.env.PORT || 3000;
 
-app.use(cors());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(cors());
 
 app.use("/public", express.static(`${process.cwd()}/public`));
 
@@ -25,10 +25,14 @@ app.get("/api/hello", function (req, res) {
 
 const shortUrls = [""];
 
+const PROJECT_URL = "http://localhost:3000";
+
 app.post("/api/shorturl/", (req, res) => {
   const url = req.body.url;
   dns.lookup(url, (err) => {
-    if (err) return res.json({ error: "invalid url" });
+    if (!url.includes(PROJECT_URL) && err) {
+      return res.json({ error: "invalid url" });
+    }
     const short_url = shortUrls.push(url) - 1;
     const body = { original_url: url, short_url: short_url };
     res.json(body);
